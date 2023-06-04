@@ -6,6 +6,9 @@ const websiteNameEl = document.getElementById('website-name');
 const websiteUrlEl = document.getElementById('website-url');
 const bookmarksContainer = document.getElementById('bookmarks-container');
 
+let bookmarks = [];
+
+
 
 // Show Modal, Focus on Input
 const showModal = () => {
@@ -33,6 +36,24 @@ const validate = (nameValue, urlValue) => {
     return true;
 }
 
+// Fetch bookmarks from localStorage
+const fetchBookmarks = () => {
+    // Get bookmars from localStorage IF available
+    if (localStorage.getItem('bookmarks')){
+        bookmarks = JSON.parse(localStorage.getItem('bookmarks'));
+    } else {
+        // Create bookmars array in localStorage
+        bookmarks = [
+            {
+                name: 'Reyner Veliz',
+                url: 'https://reynerveliz.com',
+            },
+        ];
+        localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+    }
+    console.log(bookmarks);
+}
+
 // Handle Data from Form
 const storeBookmark = e => {
     e.preventDefault();
@@ -41,11 +62,22 @@ const storeBookmark = e => {
     if (!urlValue.includes('https://') && !urlValue.includes('http://')) {
      urlValue = `https://${urlValue}`; 
 }
-    console.log(nameValue, urlValue);
     if(!validate(nameValue, urlValue)) {
         return false;
     }
+    const bookmark = {
+        name: nameValue,
+        url: urlValue,
+    };
+    bookmarks.push(bookmark);
+    localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+    fetchBookmarks();
+    bookmarkForm.reset();
+    websiteNameEl.focus();
 }
 
 // Event Listener
 bookmarkForm.addEventListener('submit', storeBookmark);
+
+// On load, fetch bookmarks
+fetchBookmarks();
